@@ -9,52 +9,44 @@ const db = new pg.Client({
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
+  ssl: {
+    rejectUnauthorized: false, // Required on Render
+  },
 });
-
 
 const app = express();
-const port = 3000;
-
-db.connect();
-let quiz=[];
-
-db.query("SELECT * FROM capitals",(err,res)=>{
-  if(err){
-    console.log("Error executing Query.",err.stack);
-  }else{
-    quiz = res.rows;
-  }
-  db.end();
-});
-
-let totalCorrect = 0;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.set("view engine", "ejs");
+app.set("views", "./views");
 
+await db.connect();
+
+let totalCorrect = 0;
 let currentQuestion = {};
 
 // GET home page
 app.get("/", async (req, res) => {
   totalCorrect = 0;
   await nextQuestion();
-  console.log(currentQuestion);
   res.render("index.ejs", { question: currentQuestion });
 });
 
-// POST a new post
-app.post("/submit", (req, res) => {
+// POST a new answer
+app.post("/submit", async (req, res) => {
   let answer = req.body.answer.trim();
   let isCorrect = false;
+
   if (currentQuestion.capital.toLowerCase() === answer.toLowerCase()) {
     totalCorrect++;
-    console.log(totalCorrect);
     isCorrect = true;
   }
 
-  nextQuestion();
+  await nextQuestion();
   res.render("index.ejs", {
     question: currentQuestion,
     wasCorrect: isCorrect,
@@ -62,12 +54,19 @@ app.post("/submit", (req, res) => {
   });
 });
 
+// Function to fetch a random quiz question
 async function nextQuestion() {
-  const randomCountry = quiz[Math.floor(Math.random() * quiz.length)];
-
-  currentQuestion = randomCountry;
+  try {
+    const res = await db.query("SELECT * FROM capitals");
+    const quiz = res.rows;
+    const randomCountry = quiz[Math.floor(Math.random() * quiz.length)];
+    currentQuestion = randomCountry;
+  } catch (err) {
+    console.error("Failed to fetch next question:", err);
+    currentQuestion = { country: "Error", capital: "Database" };
+  }
 }
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`✅ Server is running at http://localhost:${port}`);
 });
