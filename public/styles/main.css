@@ -1,26 +1,29 @@
 body {
   background-image: url(../images/background.jpg);
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   background-size: cover;
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  max-width: 40%;
-  height: 300px;
-  margin: 15% auto;
-  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  margin: 10% auto;
+  padding: 30px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding-top: 10px;
+  height: auto; /* Auto height based on content */
 }
 
 h1 {
   text-align: center;
+  font-size: 2em;
 }
 
 h3 {
@@ -34,7 +37,8 @@ h3 {
 
 input {
   text-align: center;
-  width: 30%;
+  width: 80%;
+  max-width: 300px;
   margin: 10px auto;
   padding: 10px;
   border: 1px solid #ccc;
@@ -55,13 +59,13 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  background-color: #ffd500;
+}
+
 .horizontal-container {
   display: flex;
   justify-content: space-between;
-}
-
-button:hover {
-  background-color: #ffd500;
 }
 
 #result {
@@ -80,21 +84,13 @@ button:hover {
 }
 
 @keyframes checkmark {
-  0% {
-    color: transparent;
-  }
-  100% {
-    color: green;
-  }
+  0% { color: transparent; }
+  100% { color: green; }
 }
 
 @keyframes cross {
-  0% {
-    color: transparent;
-  }
-  100% {
-    color: red;
-  }
+  0% { color: transparent; }
+  100% { color: red; }
 }
 
 .restart-button {
@@ -108,4 +104,19 @@ button:hover {
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s, color 0.3s;
+}
+
+/* Optional: minor font and margin tweaks for small screens */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+  button {
+    font-size: 1em;
+  }
 }
